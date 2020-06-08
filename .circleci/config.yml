@@ -5,7 +5,7 @@ jobs:
       - image: circleci/android:api-25-alpha
 
 
-#    working_directory: ~/repo
+    working_directory: ~/AndroidStudioProjects/CircleCI
 
     environment:
       JVM_OPTS: -Xmx3200m
@@ -16,7 +16,16 @@ jobs:
 
       - restore_cache:
           key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
-            # fallback to using the latest cache if no exact match is found
+          # fallback to using the latest cache if no exact match is found
+      - run:
+          name: TEST1
+          command: find . -name gradle*
+      - run:
+          name: CurrentPath
+          command: pwd
+      - run:
+          name: Chmod permissions #if permission for Gradlew Dependencies fail, use this.
+          command: sudo chmod +x ./gradlew
 
       - run: gradle dependencies
 
