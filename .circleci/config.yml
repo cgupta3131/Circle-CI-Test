@@ -18,9 +18,6 @@ jobs:
           key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
           # fallback to using the latest cache if no exact match is found
       - run:
-          name: TEST1
-          command: find . -name gradle*
-      - run:
           name: CurrentPath
           command: pwd
       - run:
