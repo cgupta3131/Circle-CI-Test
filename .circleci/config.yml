@@ -1,13 +1,6 @@
-# Java Gradle CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-java/ for more details
-#
 version: 2
 jobs:
   build:
-    #docker:
-    # specify the version you desire here
-    #- image: circleci/openjdk:8-jdk
     docker:
       - image: circleci/android:api-25-alpha
 
@@ -22,8 +15,7 @@ jobs:
       - checkout
 
       - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "build.gradle" }}
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
 
