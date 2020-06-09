@@ -1,44 +1,50 @@
 version: 2
 jobs:
   build:
-    docker:
-      - image: circleci/android:api-28-alpha
 
+    docker:
+      - image: circleci/android:api-28
 
     working_directory: ~/AndroidStudioProjects/CircleCI
 
     environment:
       JVM_OPTS: -Xmx3200m
-      TERM: dumb
 
     steps:
+
+      #Checkout the codebase
       - checkout
 
+      # Gradle sync Cache - Dependencies
       - restore_cache:
           key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
-          # fallback to using the latest cache if no exact match is found
+
+      # Approve Android Studio SDK Licenses
       - run:
-          name: CurrentPath
-          command: pwd
+          name: Approve license for build tools
+          command: (echo y; echo y; echo y; echo y; echo y; echo y) | $ANDROID_HOME/tools/bin/sdkmanager --licenses
+
+      #Permissions for Gradle
       - run:
           name: Chmod permissions #if permission for Gradlew Dependencies fail, use this.
           command: sudo chmod +x ./gradlew
 
-      - run: sdkmanager --install "ndk-bundle"
-      - run: sdkmanager --licenses
-#      - run: gradle dependencies
+#      #Gradle Sync
       - run:
           name: Download Dependencies
           command: ./gradlew androidDependencies
 
+      #Save Cache for future builds
       - save_cache:
           paths:
             - ~/.gradle
-          key: v1-dependencies-{{ checksum "build.gradle" }}
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
 
+      #Run all unit tests
       - run:
           name: Run Tests
           command: ./gradlew lint test
+
       - store_artifacts: # for display in Artifacts: https://circleci.com/docs/2.0/artifacts/
           path: app/build/reports
           destination: reports
